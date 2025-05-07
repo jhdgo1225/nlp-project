@@ -215,9 +215,11 @@ print("GPU count:", torch.cuda.device_count())
 print("Trainer n_gpu:", final_trainer.args.n_gpu)
 final_trainer.train()
 
-backup_dir = "./text_summarize_model.pt"
-os.makedirs(backup_dir, exist_ok=True)
-final_trainer.save_checkpoint(backup_dir)
+trainer_ckpt_dir = "./text_summarize_model_trainer_ckpt"
+os.makedirs(trainer_ckpt_dir, exist_ok=True)
+final_trainer.save_checkpoint(trainer_ckpt_dir)
+
+backup_dir = "./text_summarize_model"
 final_model.save_pretrained(backup_dir, safe_serialization=True)
 tokenizer.save_pretrained(backup_dir)
 args_path = os.path.join(backup_dir, "training_args.json")
