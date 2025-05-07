@@ -178,7 +178,7 @@ final_args = Seq2SeqTrainingArguments(
     eval_steps=200,
     logging_steps=100,
     save_steps=500,
-    num_train_epochs=1,
+    num_train_epochs=3,
     per_device_train_batch_size=4,
     per_device_eval_batch_size=4,
     gradient_accumulation_steps=8,
@@ -215,11 +215,13 @@ print("GPU count:", torch.cuda.device_count())
 print("Trainer n_gpu:", final_trainer.args.n_gpu)
 final_trainer.train()
 
-backup_dir = "./text_summarize_model"
+backup_dir = "./text_summarize_model.pt"
 os.makedirs(backup_dir, exist_ok=True)
-trainer.save_checkpoint(backup_dir)
+final_trainer.save_checkpoint(backup_dir)
+final_model.save_pretrained(backup_dir, safe_serialization=True)
+tokenizer.save_pretrained(backup_dir)
 args_path = os.path.join(backup_dir, "training_args.json")
-trainer.args.to_json_file(args_path)
+final_trainer.args.to_json_file(args_path)
 
 """
     주석 처리 -> Ray Tune 라이브러리를 이용한 하이퍼파라미터 튜닝 실행 코드
