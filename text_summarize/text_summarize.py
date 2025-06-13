@@ -5,7 +5,6 @@ from collections import defaultdict
 
 import numpy as np
 import evaluate
-from transformers import EarlyStoppingCallback
 from transformers import T5ForConditionalGeneration, T5TokenizerFast
 from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, DataCollatorForSeq2Seq
 from transformers.trainer_utils import TrainOutput
@@ -200,10 +199,7 @@ final_trainer = EpochalSeq2SeqTrainer(
         tokenizer,
         model=final_model
 	),
-    compute_metrics=compute_metrics,
-	callbacks=[
-		EarlyStoppingCallback(early_stopping_patience=2)
-	]
+    compute_metrics=compute_metrics
 )
 
 print(final_trainer.train())
