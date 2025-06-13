@@ -92,7 +92,7 @@ class Vetorizer(IterableDataset):
         self.dataset = dataset
         self.seq_length = seq_length
         self.total_count = total_count
-    
+
     def __iter__(self):
         for data in self.dataset:
             data['text'][0] = "summarize: " + data['text'][0]
@@ -111,7 +111,7 @@ class Vetorizer(IterableDataset):
         return self.total_count
 
 
-def create_dataset(tokenizer, domain_data, args, seq_length):
+def create_dataset(tokenizer, domain_data, seq_length):
     train_data = load_dataset('json', data_files=domain_data, split='train', streaming=True)
     no_iter_train_data = load_dataset('json', data_files=domain_data, split='train', streaming=False)
     total_train_data_cnt = len(no_iter_train_data)
@@ -166,6 +166,12 @@ seq_length = {
     'decoder': 512
 }
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+final_model = T5ForConditionalGeneration.from_pretrained(
+        model_ckpt
+    ).to(device)
+
 final_args = Seq2SeqTrainingArguments(
     output_dir="./text_summarize_model_arguments",
     warmup_steps=500,
@@ -183,13 +189,7 @@ final_args = Seq2SeqTrainingArguments(
 	greater_is_better=True
 )
 
-train_dataset, eval_dataset = create_dataset(tokenizer, domain_data, final_args, seq_length)
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-final_model = T5ForConditionalGeneration.from_pretrained(
-        model_ckpt
-    ).to(device)
+train_dataset, eval_dataset = create_dataset(tokenizer, domain_data, seq_length)
 
 final_trainer = EpochalSeq2SeqTrainer(
     model=final_model,
